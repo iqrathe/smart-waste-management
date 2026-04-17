@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Smart Waste Management Dashboard</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #0f172a 0%, #1a1f35 100%);
+  color: #e2e8f0;
+  min-height: 100vh;
+}
+
+/* HEADER */
+header {
+  background: linear-gradient(135deg, #0f172a 0%, #1a2240 100%);
+  color: white;
+  padding: 28px 40px;
+  text-align: left;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+header::before {
+  content: "♻️";
+  font-size: 28px;
+  margin-right: 12px;
+}
+
+header::after {
+  content: "Real-time Monitoring";
+  font-size: 12px;
+  font-weight: 400;
+  opacity: 0.7;
+  letter-spacing: 1px;
+}
+
+/* MAIN LAYOUT */
+.container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  padding: 32px 40px;
+  height: auto;
+}
+
+/* LEFT ZONES */
+.left {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  padding-right: 16px;
+}
+
+.left::-webkit-scrollbar {
+  width: 8px;
+}
+
+.left::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+}
+
+.left::-webkit-scrollbar-thumb {
+  background: rgba(102, 126, 234, 0.4);
+  border-radius: 10px;
+}
+
+.left::-webkit-scrollbar-thumb:hover {
+  background: rgba(102, 126, 234, 0.6);
+}
+
+/* ZONE CARD */
+.zone {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(102, 126, 234, 0.15);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: visible;
+  backdrop-filter: blur(15px);
+  display: flex;
+  flex-direction: column;
+  min-height: auto;
+}
+
+.zone::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+}
+
+.zone::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.zone:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 60px rgba(102, 126, 234, 0.2);
+  border-color: rgba(102, 126, 234, 0.3);
+  background: linear-gradient(135deg, rgba(38, 55, 85, 0.9) 0%, rgba(20, 30, 55, 0.95) 100%);
+}
+
+.zone-title {
+  font-weight: 800;
+  font-size: 18px;
+  margin-bottom: 16px;
+  color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+}
+
+.zone-title::before {
+  content: "📦";
+  font-size: 24px;
+}
+
+/* BINS */
+.bin-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  align-items: start;
+}
+
+.bin {
+  height: 100px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(100, 116, 139, 0.4) 0%, rgba(71, 85, 105, 0.3) 100%);
+  border: 2px solid rgba(148, 163, 184, 0.25);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  color: #cbd5e1;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.2);
+  min-width: 0;
+  padding: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.bin-header {
+  font-weight: 800;
+  font-size: 12px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid rgba(102, 126, 234, 0.4);
+  color: #667eea;
+  flex-shrink: 0;
+  letter-spacing: 0.8px;
+  text-align: center;
+}
+
+.waste-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  justify-content: flex-start;
+}
+
+.waste-bar {
+  display: flex;
+  align-items: center;
+  height: 8px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+  gap: 6px;
+}
+
+.waste-bar-fill {
+  height: 100%;
+  background: inherit;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.waste-bar.paper .waste-bar-fill { background: linear-gradient(90deg, #d4a574, #9d7c54); }
+.waste-bar.plastic .waste-bar-fill { background: linear-gradient(90deg, #667eea, #5568d3); }
+.waste-bar.metal .waste-bar-fill { background: linear-gradient(90deg, #a8a8a8, #707070); }
+.waste-bar.organic .waste-bar-fill { background: linear-gradient(90deg, #84cc16, #65a30d); }
+.waste-bar.liquid .waste-bar-fill { background: linear-gradient(90deg, #06b6d4, #0891b2); }
+
+.waste-bar::before {
+  content: attr(data-type);
+  font-size: 9px;
+  font-weight: 800;
+  color: #e2e8f0;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.bin:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.5) 0%, rgba(118, 75, 162, 0.4) 100%);
+  border-color: rgba(102, 126, 234, 0.7);
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+  color: #e2e8f0;
+}
+
+.bin:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.8);
+  color: #e2e8f0;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 8px;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+/* RIGHT PANEL */
+.right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+  padding-right: 16px;
+}
+
+.right::-webkit-scrollbar {
+  width: 8px;
+}
+
+.right::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+}
+
+.right::-webkit-scrollbar-thumb {
+  background: rgba(102, 126, 234, 0.4);
+  border-radius: 10px;
+}
+
+/* CARD */
+.card {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.card:hover {
+  box-shadow: 0 16px 48px rgba(102, 126, 234, 0.2);
+  border-color: rgba(102, 126, 234, 0.2);
+  transform: translateY(-2px);
+}
+
+/* MAP */
+#map {
+  height: 560px;
+  min-height: 520px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.map-card {
+  overflow: visible;
+}
+
+.top-banner {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.12) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 20px;
+  padding: 18px 26px;
+  margin: 24px 40px 0;
+  box-shadow: 0 14px 40px rgba(15, 23, 42, 0.35);
+}
+
+.top-banner-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #e2e8f0;
+  margin-bottom: 8px;
+}
+
+.top-banner-note {
+  font-size: 13px;
+  color: #cbd5e1;
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+.dispatch-card {
+  grid-column: 1 / -1;
+}
+
+.dispatch-item {
+  background: rgba(102, 126, 234, 0.08);
+  border-radius: 14px;
+  padding: 18px;
+  border: 1px solid rgba(102, 126, 234, 0.12);
+}
+
+.dispatch-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin-bottom: 8px;
+}
+
+.dispatch-note {
+  font-size: 12px;
+  color: #cbd5e1;
+  opacity: 0.9;
+}
+
+/* TITLES */
+.card-title {
+  font-size: 17px;
+  font-weight: 800;
+  margin-bottom: 18px;
+  color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  z-index: 1;
+}
+
+.card-title::before {
+  content: "";
+  width: 4px;
+  height: 24px;
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  border-radius: 2px;
+}
+
+/* PROGRESS BAR */
+.bar {
+  height: 12px;
+  background: rgba(71, 85, 105, 0.3);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 10px 0;
+  border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  border-radius: 999px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 15px rgba(102, 126, 234, 0.4);
+}
+
+/* LABEL */
+.label {
+  font-size: 13px;
+  color: #cbd5e1;
+  margin-top: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.label-value {
+  color: #667eea;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* SMALL BADGE */
+.badge {
+  display: inline-block;
+  padding: 8px 14px;
+  font-size: 11px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.15) 100%);
+  color: #a5b4fc;
+  border-radius: 999px;
+  margin-bottom: 14px;
+  font-weight: 700;
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+/* WASTE TYPE LEGEND */
+.waste-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.legend-item {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border-radius: 10px;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.legend-item:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border-color: rgba(102, 126, 234, 0.4);
+  transform: translateX(4px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+}
+
+.legend-color-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  border: 2px solid rgba(255,255,255,0.1);
+}
+
+.legend-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.legend-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: #e2e8f0;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.legend-desc {
+  font-size: 11px;
+  color: #cbd5e1;
+  opacity: 0.9;
+}
+
+.legend-mini-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.legend-mini-bar-fill {
+  height: 100%;
+  background: inherit;
+  width: 65%;
+  border-radius: 2px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+Smart Waste Management System — Dhaka City 
+</header>
+
+<div class="top-banner">
+  <div class="top-banner-title">Dhaka generates over 7,000 tons of waste daily.</div>
+  <div class="top-banner-note">This dashboard raises awareness and helps collection teams identify urgent bin dispatch needs.</div>
+</div>
+
+<div class="container">
+
+<!-- LEFT -->
+<div class="left" id="zones"></div>
+
+  <div class="card dispatch-card">
+    <div class="card-title">🚛 Truck Dispatch Recommendations</div>
+    <div id="dispatch-list">
+      <div class="dispatch-item">
+        <div class="dispatch-label">No bins currently flagged for dispatch.</div>
+        <div class="dispatch-note">Live dispatch suggestions will appear here as bin fill levels increase.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card map-card">
+    <div class="card-title">📍 Zone Map</div>
+    <div id="map"></div>
+  </div>
+
+</div>
+
+<script>
+
+/* ZONE DATA */
+let zonesData = [
+  {zone: 1, center: {lat:23.88, lng:90.38}},
+  {zone: 2, center: {lat:23.75, lng:90.41}},
+  {zone: 3, center: {lat:23.80, lng:90.48}},
+  {zone: 4, center: {lat:23.78, lng:90.35}},
+  {zone: 5, center: {lat:23.81, lng:90.42}}
+];
+
+let binsData = [];
+
+/* GENERATE BIN LOCATIONS */
+zonesData.forEach(zoneData => {
+  for (let b = 1; b <= 10; b++) {
+    let offsetLat = (Math.random() - 0.5) * 0.08;
+    let offsetLng = (Math.random() - 0.5) * 0.08;
+    
+    binsData.push({
+      id: `Z${zoneData.zone}B${b}`,
+      zone: zoneData.zone,
+      binNum: b,
+      lat: zoneData.center.lat + offsetLat,
+      lng: zoneData.center.lng + offsetLng,
+      waste: {
+        paper: 0,
+        plastic: 0,
+        metal: 0,
+        organic: 0,
+        liquid: 0
+      }
+    });
+  }
+});
+
+/* LEFT ZONES */
+let zones = document.getElementById("zones");
+
+for (let z = 1; z <= 5; z++) {
+  let zone = document.createElement("div");
+  zone.className = "zone";
+
+  let html = `<div class="zone-title">Zone ${z}</div>
+              <div class="bin-grid">`;
+
+  for (let b = 1; b <= 10; b++) {
+    let binData = binsData.find(x => x.zone === z && x.binNum === b);
+    let waste = binData ? binData.waste : {paper: 0, plastic: 0, metal: 0, organic: 0, liquid: 0};
+    
+    let wasteBarsHTML = `
+      <div class="waste-bar paper" data-type="P" title="Paper: ${waste.paper}%"><div class="waste-bar-fill" style="width: ${waste.paper}%"></div></div>
+      <div class="waste-bar plastic" data-type="PL" title="Plastic: ${waste.plastic}%"><div class="waste-bar-fill" style="width: ${waste.plastic}%"></div></div>
+      <div class="waste-bar metal" data-type="M" title="Metal: ${waste.metal}%"><div class="waste-bar-fill" style="width: ${waste.metal}%"></div></div>
+      <div class="waste-bar organic" data-type="O" title="Organic: ${waste.organic}%"><div class="waste-bar-fill" style="width: ${waste.organic}%"></div></div>
+      <div class="waste-bar liquid" data-type="L" title="Liquid: ${waste.liquid}%"><div class="waste-bar-fill" style="width: ${waste.liquid}%"></div></div>
+    `;
+    
+    html += `<div class="bin" data-tooltip="B${b} | Paper: ${waste.paper}% | Plastic: ${waste.plastic}% | Metal: ${waste.metal}% | Organic: ${waste.organic}% | Liquid: ${waste.liquid}%">
+              <div class="bin-header">B${b}</div>
+              <div class="waste-bars">${wasteBarsHTML}</div>
+            </div>`;
+  }
+
+  html += `</div>`;
+  zone.innerHTML = html;
+  zones.appendChild(zone);
+}
+
+function updateDispatchList() {
+  let dispatchList = document.getElementById('dispatch-list');
+  let urgentBins = binsData
+    .map(bin => ({
+      ...bin,
+      total: Object.values(bin.waste).reduce((sum, value) => sum + value, 0)
+    }))
+    .filter(bin => bin.total >= 250);
+
+  if (urgentBins.length === 0) {
+    dispatchList.innerHTML = `
+      <div class="dispatch-item">
+        <div class="dispatch-label">No bins currently flagged for dispatch.</div>
+        <div class="dispatch-note">Live dispatch suggestions will appear here as bin fill levels increase.</div>
+      </div>
+    `;
+    return;
+  }
+
+  dispatchList.innerHTML = urgentBins.map(bin => `
+    <div class="dispatch-item">
+      <div class="dispatch-label">${bin.id} — Zone ${bin.zone}</div>
+      <div class="dispatch-note">Estimated fill ${bin.total}% — assign nearest truck.</div>
+    </div>
+  `).join('');
+}
+
+function initMap() {
+  var map = L.map('map').setView([23.81, 90.41], 12);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  zonesData.forEach(zone => {
+    L.circle([zone.center.lat, zone.center.lng], {
+      radius: 4200,
+      fillColor: '#667eea',
+      fillOpacity: 0.12,
+      color: '#667eea',
+      weight: 2,
+      dashArray: '6'
+    }).addTo(map).bindPopup(`<b>Zone ${zone.zone}</b>`);
+  });
+}
+
+updateDispatchList();
+initMap();
+
+</script>
+
+</body>
+</html>
