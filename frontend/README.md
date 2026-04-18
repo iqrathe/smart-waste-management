@@ -1,132 +1,45 @@
+# Frontend (Dashboard UI)
 
-# ♻️ Smart Waste Management Dashboard (Frontend)
+This folder contains all frontend pages of the Smart Waste Management system.
 
-## 📌 Overview
+## Files
 
-This project is a **web-based Smart Waste Management Dashboard** designed to monitor waste collection across different zones in Dhaka city.
+- `index.html` -> Main dashboard (daily waste, dispatch, map, links to zone pages)
+- `zones.html` -> Zone-wise bin fill levels and category bars
+- `zones-info.html` -> Zone place info + bin place mapping and map
 
-It visualizes:
+## How it works
 
-* Bin fill levels
-* Waste type distribution (paper, plastic, metal, organic, liquid)
-* Zone-wise monitoring
-* Truck dispatch recommendations
-* Live map of waste zones
+All pages are plain HTML/CSS/JS and call the Node.js API:
 
-The system helps improve **waste collection efficiency and decision-making**.
+- API base: `http://127.0.0.1:5000`
 
----
+### Main dashboard (`index.html`)
 
-## 🚀 Features
+- Polls backend every 3 seconds
+- Fetches:
+  - `/bins` (to keep data current)
+  - `/dispatch` (urgent dispatch list)
+  - `/stats` (daily waste generated)
+- Daily waste shown on the card comes from backend total of all bin waste amounts.
 
-### 🗂 Zone-Based Monitoring
+### Zone levels (`zones.html`)
 
-* 5 different zones in Dhaka
-* Each zone contains multiple smart bins
-* Real-time visualization of bin status
+- Polls `/bins` every 3 seconds
+- Renders each zone and all bins with category progress bars.
 
-### 🗑 Waste Classification Display
+### Zone info (`zones-info.html`)
 
-Each bin shows:
+- Shows zone-level Dhaka area info and bin location table
+- Fetches `/bins` for bin list and zone references
+- Uses map markers for Dhaka + zones
+- User-entered zone/bin place labels are stored in browser `localStorage`.
 
-* Paper
-* Plastic
-* Metal
-* Organic
-* Liquid
+## Open frontend
 
-Using dynamic progress bars.
+After starting backend, open:
 
-### 🚛 Smart Dispatch System
+- `frontend/index.html`
 
-* Automatically detects overloaded bins
-* Suggests which bins need urgent collection
-
-### 🗺 Interactive Map
-
-* Built using Leaflet.js
-* Displays zone locations on map
-* Helps visualize coverage area
-
-### 📊 Dashboard UI
-
-* Modern responsive design
-* Card-based layout
-* Hover effects and tooltips
-
----
-
-## 🛠️ Technologies Used
-
-* **HTML5** – Structure
-* **CSS3** – Styling (Modern UI + gradients + animations)
-* **JavaScript (Vanilla JS)** – Logic & dynamic updates
-* **Leaflet.js** – Interactive maps
-* **OpenStreetMap API** – Map tiles
-
----
-
-## 📁 Project Structure
-
-```bash
-frontend/
-│
-├── index.html      # Main dashboard UI
-├── style (inline)  # Embedded CSS styling
-├── script (inline) # JavaScript logic
-```
-
----
-
-## ⚙️ How It Works
-
-1. Predefined zones are created with coordinates
-2. Bins are dynamically generated for each zone
-3. Random waste data simulates real-time fill levels
-4. Waste percentages are displayed using progress bars
-5. System calculates total fill level
-6. If threshold exceeds → dispatch recommendation is triggered
-7. Map shows all zones visually
-
----
-
-## ▶️ How to Run
-
-1. Download or clone the repository:
-
-```bash
-git clone https://github.com/iqrathe/smart-waste-management.git
-```
-
-2. Go to frontend folder:
-
-```bash
-cd frontend
-```
-
-3. Open `index.html` in browser:
-
-* Double click OR
-* Right click → Open with browser
-
----
-
-## 💡 Future Improvements
-
-* Connect with real IoT sensors
-* Real-time API integration
-* Database for storing bin data
-* Mobile app integration
-* AI-based waste classification
-
----
-
-## 🎯 Purpose
-
-This project is built to:
-
-* Improve urban waste management
-* Reduce overflow of bins
-* Optimize garbage collection routes
-* Raise awareness about waste distribution
+You can open the other pages from dashboard buttons.
 
