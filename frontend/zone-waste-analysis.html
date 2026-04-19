@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zone-wise Waste Analysis • Smart Waste Management</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="i18n.js"></script>
+
+  <style>
+    :root {
+      --text: #0f172a;
+      --muted: #475569;
+      --accent: #ff2d78;
+      --accent-2: #7c3aed;
+      --accent-3: #06b6d4;
+      --success: #16a34a;
+      --warning: #f59e0b;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      background:
+        radial-gradient(1100px 620px at 10% 0%, rgba(255, 45, 120, 0.22), transparent 60%),
+        radial-gradient(1000px 700px at 95% 10%, rgba(124, 58, 237, 0.18), transparent 58%),
+        radial-gradient(900px 780px at 70% 100%, rgba(6, 182, 212, 0.16), transparent 55%),
+        linear-gradient(180deg, #070a1a 0%, #0b1030 52%, #0b1233 100%);
+      color: var(--text);
+      font-family: 'Inter', 'Noto Sans Bengali', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 16px;
+      margin: 0;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.72));
+      border-bottom: 1px solid rgba(15, 23, 42, 0.10);
+    }
+
+    .topbar-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: linear-gradient(90deg, rgba(255, 45, 120, 0.28), rgba(124, 58, 237, 0.20), rgba(6, 182, 212, 0.18));
+      border: 1px solid rgba(15, 23, 42, 0.10);
+      box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(15, 23, 42, 0.10);
+      background: rgba(255, 255, 255, 0.75);
+      color: var(--muted);
+      font-size: 13px;
+      box-shadow: 0 10px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    .pill strong { color: var(--text); font-weight: 600; }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .toolbar-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      border-radius: 14px;
+      font-family: inherit;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 14px;
+      color: white;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3));
+      box-shadow: 0 16px 30px rgba(255, 45, 120, 0.18);
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+
+    .btn:hover { filter: saturate(1.05); }
+    .btn:active { transform: translateY(1px); }
+
+    .source-callout {
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(15, 23, 42, 0.10);
+      border-radius: 16px;
+      padding: 16px 18px;
+      margin-bottom: 22px;
+      box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
+      border-left: 4px solid var(--accent-2);
+    }
+
+    .source-callout h2 {
+      margin: 0 0 8px 0;
+      font-size: 15px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .source-callout h2 i { color: var(--accent); }
+
+    .source-callout p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .source-callout ul {
+      margin: 10px 0 0 0;
+      padding-left: 1.2rem;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .summary-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.94), rgba(255,255,255,0.78));
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 18px 36px rgba(15, 23, 42, 0.10);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .summary-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-3), var(--accent), var(--accent-2));
+    }
+
+    .summary-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .summary-value {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-top: 6px;
+      color: var(--text);
+    }
+
+    .summary-hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .zones-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 16px;
+    }
+
+    .zone-card {
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 18px 36px rgba(15, 23, 42, 0.10);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .zone-card-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.06), rgba(124, 58, 237, 0.05));
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .zone-card-title {
+      font-weight: 800;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .zone-card-title i { color: var(--accent); }
+
+    .zone-tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(124, 58, 237, 0.10);
+      color: var(--accent-2);
+      white-space: nowrap;
+    }
+
+    .zone-card-body {
+      padding: 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      font-size: 14px;
+    }
+
+    .metric-row span:first-child { color: var(--muted); }
+    .metric-row strong { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+    .dominant {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .chip {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(15, 23, 42, 0.10);
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .chip.top {
+      background: linear-gradient(135deg, rgba(255, 45, 120, 0.12), rgba(124, 58, 237, 0.08));
+      border-color: rgba(124, 58, 237, 0.25);
+      color: var(--text);
+    }
+
+    .breakdown-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 6px 0;
+    }
+
+    .bar-label {
+      width: 72px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .bar-value {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      min-width: 38px;
+      text-align: right;
+    }
+
+    .waste-bar {
+      height: 10px;
+      background: rgba(15, 23, 42, 0.08);
+      border-radius: 5px;
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .fill {
+      height: 100%;
+      border-radius: 5px;
+    }
+
+    .paper { background: linear-gradient(90deg, #f97316, #f59e0b); }
+    .plastic { background: linear-gradient(90deg, #2563eb, #06b6d4); }
+    .metal { background: linear-gradient(90deg, #64748b, #94a3b8); }
+    .organic { background: linear-gradient(90deg, #22c55e, #16a34a); }
+    .other { background: linear-gradient(90deg, #a855f7, #7c3aed); }
+
+    .recycle-box {
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: linear-gradient(135deg, rgba(22, 163, 74, 0.10), rgba(6, 182, 212, 0.08));
+      border: 1px solid rgba(22, 163, 74, 0.22);
+    }
+
+    .recycle-box .head {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--success);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .recycle-box p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    @media (max-width: 900px) {
+      .summary-grid { grid-template-columns: 1fr; }
+      .zones-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body data-i18n-page="zoneAnalysis">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true"><i class="fas fa-chart-pie"></i></div>
+        <div style="min-width:0;">
+          <div class="brand-title" data-i18n="analysis.brandTitle">Zone-wise Waste Analysis</div>
+          <div class="brand-subtitle" data-i18n="analysis.brandSubtitle">Dhaka • Daily generation, composition & recycling potential by zone</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <div id="dip-lang-mount"></div>
+        <div class="pill"><i class="fas fa-city"></i> <span id="dip-analysis-pill-zones"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="toolbar-row">
+      <a class="btn" href="index.html"><i class="fas fa-arrow-left"></i> <span data-i18n="analysis.btnBack">Back to dashboard</span></a>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <a class="btn" href="zones.html" style="background: linear-gradient(90deg, #475569, #334155); box-shadow: 0 12px 24px rgba(15,23,42,0.15);"><i class="fas fa-chart-column"></i> <span data-i18n="analysis.btnLevels">Zones levels</span></a>
+        <a class="btn" href="zones-info.html" style="background: linear-gradient(90deg, #0ea5e9, #6366f1); box-shadow: 0 12px 24px rgba(14,165,233,0.2);"><i class="fas fa-location-dot"></i> <span data-i18n="analysis.btnInfo">Zones info</span></a>
+      </div>
+    </div>
+
+    <section class="source-callout" aria-labelledby="data-sources-heading">
+      <h2 id="data-sources-heading"><i class="fas fa-book"></i> <span data-i18n="analysis.sourceTitle">Where this information comes from</span></h2>
+      <p data-i18n-html="analysis.sourceP1"></p>
+      <ul>
+        <li data-i18n-html="analysis.sourceLi1"></li>
+        <li data-i18n-html="analysis.sourceLi2"></li>
+        <li data-i18n-html="analysis.sourceLi3"></li>
+      </ul>
+      <p style="margin-top:12px;" data-i18n-html="analysis.sourceP2"></p>
+    </section>
+
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-label" data-i18n="analysis.sum1Label">City-wide MSW (all 5 zones)</div>
+        <div class="summary-value" data-i18n="analysis.sum1Value">4,200 t/day</div>
+        <div class="summary-hint" data-i18n="analysis.sum1Hint">Approximate combined daily generation used for this demo model.</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label" data-i18n="analysis.sum2Label">Highest-generation zone</div>
+        <div class="summary-value" data-i18n="analysis.sum2Value">Zone 5</div>
+        <div class="summary-hint" data-i18n="analysis.sum2Hint">Central commercial & dense mixed use (model assumption).</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label" data-i18n="analysis.sum3Label">Typical city recycling potential</div>
+        <div class="summary-value" data-i18n="analysis.sum3Value">18–24%</div>
+        <div class="summary-hint" data-i18n="analysis.sum3Hint">Of daily MSW, if sorting and processing were optimized (literature range).</div>
+      </div>
+    </div>
+
+    <div class="zones-grid" id="zonesRoot"></div>
+  </div>
+
+  <script>
+    function barRow(label, pct, cls) {
+      return `
+        <div class="bar-row">
+          <span class="bar-label">${label}</span>
+          <div class="waste-bar"><div class="fill ${cls}" style="width:${pct}%"></div></div>
+          <span class="bar-value">${pct}%</span>
+        </div>`;
+    }
+
+    function renderZoneAnalysisCards() {
+      const root = document.getElementById("zonesRoot");
+      if (!root) return;
+      const zones = DIP_I18N.getZoneAnalysisRows();
+      const T = DIP_I18N.t;
+      root.innerHTML = zones.map((z) => `
+      <article class="zone-card">
+        <div class="zone-card-header">
+          <div class="zone-card-title"><i class="fas fa-map-marker-alt"></i> ${T("zonesInfo.zoneCardTitle", { n: z.id, label: z.name })}</div>
+          <span class="zone-tag">${T("analysis.zoneTag", { n: z.dailyTonnes.toLocaleString() })}</span>
+        </div>
+        <div class="zone-card-body">
+          <div class="metric-row">
+            <span>${T("analysis.metricDaily")}</span>
+            <strong>${T("analysis.metricTonnes", { n: z.dailyTonnes.toLocaleString() })}</strong>
+          </div>
+          <div>
+            <div class="breakdown-title" style="margin-bottom:8px;">${T("analysis.dominateTitle")}</div>
+            <div class="dominant">
+              <span class="chip top"><i class="fas fa-fire-flame-curved"></i> ${z.dominant}</span>
+              <span class="chip">${z.secondary}</span>
+            </div>
+          </div>
+          <div>
+            <div class="breakdown-title" style="margin-bottom:8px;">${T("analysis.compTitle")}</div>
+            ${barRow(T("waste.organic"), z.composition.organic, "organic")}
+            ${barRow(T("waste.plastic"), z.composition.plastic, "plastic")}
+            ${barRow(T("waste.paper"), z.composition.paper, "paper")}
+            ${barRow(T("waste.metal"), z.composition.metal, "metal")}
+            ${barRow(T("waste.other"), z.composition.other, "other")}
+          </div>
+          <div class="recycle-box">
+            <div class="head"><i class="fas fa-recycle"></i> ${T("analysis.recycleHead")}</div>
+            <p>${T("analysis.recycleBody", { pct: z.recyclePercent, t: z.recycleTonnes.toLocaleString() })}</p>
+          </div>
+          <p style="margin:0; font-size:12px; color: var(--muted);"><i class="fas fa-lightbulb" style="color: var(--warning);"></i> ${z.note}</p>
+        </div>
+      </article>
+    `).join("");
+    }
+
+    function setAnalysisPill() {
+      const el = document.getElementById("dip-analysis-pill-zones");
+      if (el) el.textContent = DIP_I18N.t("analysis.pillZones", { n: "5" });
+    }
+
+    DIP_I18N.apply(document);
+    DIP_I18N.mountLanguageSwitcher("#dip-lang-mount");
+    setAnalysisPill();
+
+    window.addEventListener("dip-lang-change", () => {
+      DIP_I18N.apply(document);
+      setAnalysisPill();
+      renderZoneAnalysisCards();
+    });
+
+    renderZoneAnalysisCards();
+  </script>
+</body>
+</html>

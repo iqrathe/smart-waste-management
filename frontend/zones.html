@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zones Overview • Smart Waste Management</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="i18n.js"></script>
+
+  <style>
+    :root {
+      --bg: #f7f8ff;
+      --surface: #ffffff;
+      --surface-2: #f3f5ff;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: rgba(15, 23, 42, 0.10);
+      --shadow: rgba(15, 23, 42, 0.10);
+
+      /* Bright, modern accents */
+      --accent: #ff2d78;     /* pink */
+      --accent-2: #7c3aed;   /* purple */
+      --accent-3: #06b6d4;   /* cyan */
+
+      --danger: #e11d48;
+      --warning: #f59e0b;
+      --success: #16a34a;
+      --ring: rgba(37, 99, 235, 0.22);
+
+      /* Readability on deep backgrounds */
+      --page-text: rgba(248, 250, 252, 0.92);
+      --page-muted: rgba(226, 232, 240, 0.72);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      background:
+        radial-gradient(1100px 620px at 10% 0%, rgba(255, 45, 120, 0.22), transparent 60%),
+        radial-gradient(1000px 700px at 95% 10%, rgba(124, 58, 237, 0.18), transparent 58%),
+        radial-gradient(900px 780px at 70% 100%, rgba(6, 182, 212, 0.16), transparent 55%),
+        radial-gradient(900px 500px at 20% 70%, rgba(34, 197, 94, 0.10), transparent 60%),
+        linear-gradient(180deg, #070a1a 0%, #0b1030 52%, #0b1233 100%);
+      color: var(--text);
+      font-family: 'Inter', 'Noto Sans Bengali', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.72));
+      border-bottom: 1px solid rgba(15, 23, 42, 0.10);
+      color: var(--text);
+    }
+
+    .topbar-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: linear-gradient(90deg, rgba(255, 45, 120, 0.28), rgba(124, 58, 237, 0.20), rgba(6, 182, 212, 0.18));
+      border: 1px solid rgba(15, 23, 42, 0.10);
+      box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
+      color: var(--text);
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 20px;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 0 0 auto;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(15, 23, 42, 0.10);
+      background: rgba(255, 255, 255, 0.75);
+      color: var(--muted);
+      font-size: 13px;
+      box-shadow: 0 10px 18px rgba(15, 23, 42, 0.08);
+      white-space: nowrap;
+    }
+
+    .pill strong { color: var(--text); font-weight: 600; }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .toolbar-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .btn {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      border-radius: 14px;
+      font-family: inherit;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:active { transform: translateY(1px); }
+
+    .btn-primary {
+      padding: 12px 14px;
+      color: white;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3));
+      box-shadow: 0 16px 30px rgba(37, 99, 235, 0.20);
+    }
+
+    .btn-primary:hover {
+      filter: saturate(1.05);
+      box-shadow: 0 18px 36px rgba(37, 99, 235, 0.24);
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 18px;
+      box-shadow: 0 18px 36px rgba(15, 23, 42, 0.10);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-3), var(--accent), var(--accent-2));
+      opacity: 0.9;
+    }
+
+    .panel-header {
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.06), rgba(124, 58, 237, 0.04));
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.01em;
+    }
+
+    .panel-title i { color: var(--accent); }
+
+    .panel-body { padding: 16px; }
+
+    .zone {
+      background: rgba(255,255,255,0.70);
+      margin-bottom: 16px;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+
+    .zone:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.86);
+    }
+
+    .zone-title {
+      font-size: 14px;
+      margin-bottom: 12px;
+      color: var(--text);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .zone-title-left {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .zone-title i { color: var(--accent); }
+
+    .zone-badge {
+      font-size: 12px;
+      color: var(--muted);
+      border: 1px solid rgba(15, 23, 42, 0.10);
+      background: rgba(255,255,255,0.85);
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+
+    .bin-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+    }
+
+    .bin {
+      background: rgba(255,255,255,0.90);
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(15, 23, 42, 0.10);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bin:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 44px rgba(15, 23, 42, 0.14);
+    }
+
+    .bin.high { border-color: rgba(225, 29, 72, 0.38); }
+    .bin.medium { border-color: rgba(245, 158, 11, 0.38); }
+    .bin.low { border-color: rgba(37, 99, 235, 0.28); }
+
+    .bin-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-weight: 700;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .severity {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(15, 23, 42, 0.10);
+      background: rgba(255,255,255,0.85);
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .bin.high .severity {
+      color: var(--danger);
+      border-color: rgba(225, 29, 72, 0.30);
+      background: rgba(225, 29, 72, 0.08);
+    }
+
+    .bin.medium .severity {
+      color: var(--warning);
+      border-color: rgba(245, 158, 11, 0.30);
+      background: rgba(245, 158, 11, 0.10);
+    }
+
+    .bin.low .severity {
+      color: var(--accent);
+      border-color: rgba(37, 99, 235, 0.26);
+      background: rgba(37, 99, 235, 0.08);
+    }
+
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 6px 0;
+    }
+
+    .bar-label { width: 78px; font-size: 12px; color: var(--muted); }
+    .bar-value { margin-left: auto; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+    .waste-bar {
+      height: 10px;
+      background: rgba(15, 23, 42, 0.08);
+      border-radius: 5px;
+      overflow: hidden;
+      position: relative;
+      flex: 1;
+    }
+
+    .fill { height: 100%; border-radius: 5px; transition: width 0.8s ease; }
+
+    .paper { background: linear-gradient(90deg, #f97316, #f59e0b); }
+    .plastic { background: linear-gradient(90deg, #2563eb, #06b6d4); }
+    .metal { background: linear-gradient(90deg, #64748b, #94a3b8); }
+    .organic { background: linear-gradient(90deg, #22c55e, #16a34a); }
+    .total_average { background: linear-gradient(90deg, #7c3aed, #2563eb); }
+
+    .loading {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(15, 23, 42, 0.10);
+      border-top: 3px solid var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    @media (max-width: 768px) {
+      .container { padding: 16px; }
+      .topbar-inner { padding: 14px 16px; }
+      .brand-title { font-size: 16px; }
+      .brand-subtitle { display: none; }
+      .toolbar-row { flex-direction: column; align-items: stretch; }
+      .bin-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body data-i18n-page="zones">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true"><i class="fas fa-layer-group"></i></div>
+        <div style="min-width:0;">
+          <div class="brand-title" data-i18n="zones.brandTitle">Zones overview</div>
+          <div class="brand-subtitle" data-i18n="zones.brandSubtitle">All zones & bins • Live updates</div>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <div id="dip-lang-mount"></div>
+        <div class="pill"><i class="fas fa-rotate"></i> <span data-i18n="zones.pillEvery">every</span> <strong data-i18n="dashboard.pill3s">3s</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="toolbar-row">
+      <a class="btn btn-primary" href="index.html">
+        <i class="fas fa-arrow-left"></i> <span data-i18n="zones.btnBack">Back to dashboard</span>
+      </a>
+      <a class="btn btn-primary" href="zone-waste-analysis.html">
+        <i class="fas fa-chart-pie"></i> <span data-i18n="zones.btnAnalysis">Zone-wise Waste Analysis</span>
+      </a>
+      <a class="btn btn-primary" href="zones-info.html">
+        <i class="fas fa-location-dot"></i> <span data-i18n="zones.btnInfo">Zones info</span>
+      </a>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <h2 class="panel-title"><i class="fas fa-map-marker-alt"></i> <span data-i18n="zones.panelTitle">Zones details</span></h2>
+        <div class="pill" style="box-shadow:none;"><i class="fas fa-signal"></i> <span data-i18n="zones.pillLive">Live</span></div>
+      </div>
+      <div class="panel-body">
+        <div id="zones">
+          <div class="loading"></div> <span data-i18n="zones.loading">Loading zones...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = "http://127.0.0.1:5000";
+    let binsData = [];
+
+    DIP_I18N.apply(document);
+    DIP_I18N.mountLanguageSwitcher("#dip-lang-mount");
+
+    async function fetchData() {
+      try {
+        let res = await fetch(API + "/bins");
+        binsData = await res.json();
+        renderZones();
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        const zones = document.getElementById("zones");
+        if (zones) zones.innerHTML = DIP_I18N.t("zones.error");
+      }
+    }
+
+    function bar(value, cls, label) {
+      return `
+        <div class="bar-row">
+          <span class="bar-label">${label}</span>
+          <div class="waste-bar">
+            <div class="fill ${cls}" style="width:${value}%"></div>
+          </div>
+          <span class="bar-value">${value}%</span>
+        </div>`;
+    }
+
+    function renderZones() {
+      let container = document.getElementById("zones");
+      if (!container) return;
+      container.innerHTML = "";
+
+      for (let z = 1; z <= 5; z++) {
+        let zoneDiv = document.createElement("div");
+        zoneDiv.className = "zone";
+
+        let zoneBins = binsData.filter(b => b.zone === z);
+        let html = `<div class="zone-title">
+                      <div class="zone-title-left"><i class="fas fa-map-marker-alt"></i> ${DIP_I18N.t("zones.zoneTitle", { n: z })}</div>
+                      <div class="zone-badge">${DIP_I18N.t("zones.binsCount", { n: zoneBins.length })}</div>
+                    </div>
+                    <div class="bin-grid">`;
+
+        zoneBins.forEach(bin => {
+          let w = bin.waste;
+          let total = Object.values(w).reduce((a,b)=>a+b,0);
+
+          let binClass = "bin low";
+          let severityKey = "zones.severity.low";
+          if (total >= 250) binClass = "bin high";
+          else if (total >= 150) binClass = "bin medium";
+          if (total >= 250) severityKey = "zones.severity.high";
+          else if (total >= 150) severityKey = "zones.severity.medium";
+          const severityLabel = DIP_I18N.t(severityKey);
+
+          html += `
+            <div class="${binClass}">
+              <div class="bin-header">
+                <span>${bin.id}</span>
+                <span class="severity">${severityLabel}</span>
+              </div>
+
+              ${bar(w.paper, "paper", DIP_I18N.t("waste.paper"))}
+              ${bar(w.plastic, "plastic", DIP_I18N.t("waste.plastic"))}
+              ${bar(w.metal, "metal", DIP_I18N.t("waste.metal"))}
+              ${bar(w.organic, "organic", DIP_I18N.t("waste.organic"))}
+              ${bar(w.total_average, "total_average", DIP_I18N.t("waste.totalAvg"))}
+            </div>`;
+        });
+
+        html += "</div>";
+        zoneDiv.innerHTML = html;
+        container.appendChild(zoneDiv);
+      }
+    }
+
+    window.addEventListener("dip-lang-change", () => {
+      renderZones();
+    });
+
+    setInterval(fetchData, 3000);
+    fetchData();
+  </script>
+</body>
+</html>
+
